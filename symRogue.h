@@ -38,7 +38,7 @@ char* s;
 {
 	register char* p = s;
 	while ( *p )
-		_putchar( *p++ );
+		putchar( *p++ );
 }
 
 #endif
