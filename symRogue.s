@@ -13,9 +13,13 @@
 	.forceimport	__STARTUP__
 	.import		_putchar
 	.import		_getchar
+	.import		_strcpy
 	.import		_memset
 	.import		_rand
+	.import		_itoa
 	.export		__puts
+	.export		_t_str
+	.export		_stat_str
 	.export		_map
 	.export		_k_input
 	.export		_plyr_pos
@@ -30,6 +34,7 @@
 	.export		_mtpCmbt
 	.export		_ptmCmbt
 	.export		_printMap
+	.export		_prntStat
 	.export		_main
 
 .segment	"DATA"
@@ -43,11 +48,17 @@ S0003:
 	.byte	$59,$6F,$75,$20,$64,$69,$65,$64,$2E,$2E,$2E,$00
 S0001:
 	.byte	$1B,$5B,$32,$4A,$00
+S0004:
+	.byte	$48,$50,$3A,$20,$00
 S0002:
 	.byte	$1B,$5B,$48,$00
 
 .segment	"BSS"
 
+_t_str:
+	.res	4,$00
+_stat_str:
+	.res	20,$00
 _map:
 	.res	160,$00
 _plyr_pos:
@@ -388,6 +399,53 @@ M0001:
 .endproc
 
 ; ---------------------------------------------------------------
+; void __near__ prntStat (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_prntStat: near
+
+.segment	"CODE"
+
+	ldy     #$13
+	lda     #$20
+L0002:	sta     _stat_str,y
+	dey
+	bpl     L0002
+	jsr     decsp4
+	lda     _plyr_hp
+	ldy     #$02
+	sta     (sp),y
+	iny
+	lda     #$00
+	sta     (sp),y
+	lda     #<(_t_str)
+	sta     (sp)
+	ldy     #$01
+	lda     #>(_t_str)
+	sta     (sp),y
+	ldx     #$00
+	lda     #$0A
+	jsr     _itoa
+	ldy     #$FF
+L0003:	iny
+	lda     S0004,y
+	sta     _stat_str,y
+	bne     L0003
+	lda     #<(_stat_str+4)
+	ldx     #>(_stat_str+4)
+	jsr     pushax
+	lda     #<(_t_str)
+	ldx     #>(_t_str)
+	jsr     _strcpy
+	lda     #<(_stat_str)
+	ldx     #>(_stat_str)
+	jmp     __puts
+
+.endproc
+
+; ---------------------------------------------------------------
 ; void __near__ main (void)
 ; ---------------------------------------------------------------
 
@@ -491,6 +549,7 @@ L000A:	jsr     _parsInpt
 	ldx     #>(S0002)
 	jsr     __puts
 	jsr     _printMap
+	jsr     _prntStat
 	jsr     _getchar
 	sta     _k_input
 	ldx     #$00

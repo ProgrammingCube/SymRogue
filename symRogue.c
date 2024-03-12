@@ -13,6 +13,8 @@
 #define	M_MAX_HP	30
 
 /* globals */
+char t_str[4];
+char stat_str[20];
 unsigned char map[ MAP_SIZE ];
 unsigned char k_input = 0x00;
 unsigned char plyr_pos,
@@ -29,6 +31,7 @@ void updtMons();
 void mtpCmbt();
 void ptmCmbt();
 void printMap();
+void prntStat();
 
 /* main func */
 void main()
@@ -77,6 +80,9 @@ void main()
 		/* draw screen */
 		clrscr();
 		printMap();
+
+		/* print status bar */
+		prntStat();
 
 		/* get input */
 		k_input = input();
@@ -233,4 +239,17 @@ void printMap()
 			newline();
 		}
 	}
+}
+
+/* void prntStat()
+ *
+ * prints status message
+ */
+void prntStat()
+{
+	memset( stat_str, ' ', 20 );
+	itoa( plyr_hp, t_str, 10 );
+	strcpy( stat_str, "HP: " );
+	strcpy( stat_str + 4, t_str );
+	puts( stat_str );
 }
