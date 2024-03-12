@@ -23,8 +23,8 @@ if exist symRogue.c (
 	if exist symRogue.bin (
 		del symRogue.bin
 	)
-	if exist symRogue.hex (
-		del symRogue.hex
+	if exist sym_build\symRogue.hex (
+		del sym_build\symRogue.hex
 	)
 	%cc65dir%\bin\cc65 --cpu 65C02 -t sym1 -Cl -Osir -DSYM symRogue.c
 	%cc65dir%\bin\ca65 --cpu 65C02 symRogue.s
