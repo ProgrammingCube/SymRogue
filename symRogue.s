@@ -13,7 +13,7 @@
 	.forceimport	__STARTUP__
 	.import		_putchar
 	.import		_getchar
-	.import		_strcpy
+	.import		_memcpy
 	.import		_memset
 	.import		_rand
 	.import		_itoa
@@ -415,11 +415,6 @@ M0001:
 
 .segment	"CODE"
 
-	ldy     #$03
-	lda     #$20
-L0002:	sta     _t_str,y
-	dey
-	bpl     L0002
 	jsr     decsp4
 	lda     _plyr_hp
 	ldy     #$02
@@ -435,17 +430,16 @@ L0002:	sta     _t_str,y
 	ldx     #$00
 	lda     #$0A
 	jsr     _itoa
-	ldy     #$FF
-L0003:	iny
-	lda     S0004,y
+	ldy     #$03
+L0002:	lda     S0004,y
 	sta     _stat_str,y
-	bne     L0003
-	lda     #<(_stat_str+4)
-	ldx     #>(_stat_str+4)
-	jsr     pushax
-	lda     #<(_t_str)
-	ldx     #>(_t_str)
-	jsr     _strcpy
+	dey
+	bpl     L0002
+	ldy     #$03
+L0003:	lda     _t_str,y
+	sta     _stat_str+4,y
+	dey
+	bpl     L0003
 	lda     #<(_stat_str)
 	ldx     #>(_stat_str)
 	jmp     __puts
