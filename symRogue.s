@@ -26,6 +26,8 @@
 	.export		_parsInpt
 	.export		_updtPlyr
 	.export		_updtMons
+	.export		_monsCmbt
+	.export		_plyrCmbt
 	.export		_printMap
 	.export		_main
 
@@ -157,10 +159,12 @@ L000E:	lda     M0001
 	cmp     #$03
 	bcs     L0006
 	ldy     _temp_pos
+	ldx     #$00
 	lda     _map,y
 	ldy     M0001
 	cmp     _mons_ch,y
 	bne     L000F
+	jsr     _plyrCmbt
 	lda     _plyr_pos
 	sta     _temp_pos
 L000F:	inc     M0001
@@ -231,6 +235,9 @@ L0008:	ldy     M0003
 L0022:	lda     M0003
 	cmp     _plyr_pos
 	bne     L0011
+	ldx     #$00
+	lda     M0001
+	jsr     _monsCmbt
 	ldy     M0001
 	lda     _mons_xy,y
 	sta     M0003
@@ -287,6 +294,35 @@ M0002:
 	.res	1,$00
 M0003:
 	.res	1,$00
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ monsCmbt (unsigned char i)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_monsCmbt: near
+
+.segment	"CODE"
+
+	jsr     pusha
+	jmp     incsp1
+
+.endproc
+
+; ---------------------------------------------------------------
+; void __near__ plyrCmbt (void)
+; ---------------------------------------------------------------
+
+.segment	"CODE"
+
+.proc	_plyrCmbt: near
+
+.segment	"CODE"
+
+	rts
 
 .endproc
 

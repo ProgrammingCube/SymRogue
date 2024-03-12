@@ -6,6 +6,11 @@
 #define	MAP_SIZE	ROW_LEN * COL_HEIGHT
 #define	ROW_MASK	( ROW_LEN - 1 )
 #define	MONS_NUM	3
+#define	MONS_XP		10
+#define	MONS_ATK	5
+#define	PLYR_ATK	10
+#define	P_MAX_HP	50
+#define	M_MAX_HP	30
 
 /* globals */
 unsigned char map[ MAP_SIZE ];
@@ -20,6 +25,8 @@ unsigned char mons_xy[ MONS_NUM ],
 void parsInpt();
 void updtPlyr();
 void updtMons();
+void monsCmbt();
+void plyrCmbt();
 void printMap();
 
 /* main func */
@@ -117,6 +124,7 @@ void updtPlyr()
 		if ( map[ temp_pos ] == mons_ch[ i ] )
 		{
 			/* combat */
+			plyrCmbt();
 			temp_pos = plyr_pos;
 		}
 	}
@@ -163,6 +171,8 @@ void updtMons()
 		}
 		if ( mtmp_pos == plyr_pos )
 		{
+			/* combat */
+			monsCmbt( i );
 			mtmp_pos = mons_xy[ i ];
 		}
 		map[ mons_xy [ i ] ] = '.';
@@ -176,6 +186,25 @@ void updtMons()
 
 		map[ mons_xy[ i ] ] = mons_ch[ i ];
 	}
+}
+
+/* void monsCmbt( i )
+ *
+ * enters a combat routine for mons[ i ]
+ */
+void monsCmbt( i )
+unsigned char i;
+{
+
+}
+
+/* void plyrCmbt()
+ *
+ * enters monster to player combat
+ */
+void plyrCmbt()
+{
+
 }
 
 /* void printMap()
