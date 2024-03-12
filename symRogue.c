@@ -247,9 +247,9 @@ void printMap()
  */
 void prntStat()
 {
-	memset( stat_str, ' ', 20 );
+	memset( t_str, ' ', 4 );
 	itoa( plyr_hp, t_str, 10 );
-	strcpy( stat_str, "HP: " );
+	strcpy( stat_str, "HP:\t" );
 	strcpy( stat_str + 4, t_str );
 	puts( stat_str );
 }

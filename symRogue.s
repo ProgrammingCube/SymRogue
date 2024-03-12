@@ -49,7 +49,7 @@ S0003:
 S0001:
 	.byte	$1B,$5B,$32,$4A,$00
 S0004:
-	.byte	$48,$50,$3A,$20,$00
+	.byte	$48,$50,$3A,$09,$00
 S0002:
 	.byte	$1B,$5B,$48,$00
 
@@ -408,9 +408,9 @@ M0001:
 
 .segment	"CODE"
 
-	ldy     #$13
+	ldy     #$03
 	lda     #$20
-L0002:	sta     _stat_str,y
+L0002:	sta     _t_str,y
 	dey
 	bpl     L0002
 	jsr     decsp4
