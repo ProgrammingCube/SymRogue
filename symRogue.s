@@ -44,13 +44,13 @@ _k_input:
 
 .segment	"RODATA"
 
-S0003:
+S0005:
 	.byte	$59,$6F,$75,$20,$64,$69,$65,$64,$2E,$2E,$2E,$00
-S0001:
+S0003:
 	.byte	$1B,$5B,$32,$4A,$00
-S0004:
+S0006:
 	.byte	$48,$50,$3A,$09,$00
-S0002:
+S0004:
 	.byte	$1B,$5B,$48,$00
 
 .segment	"BSS"
@@ -61,12 +61,14 @@ _stat_str:
 	.res	20,$00
 _map:
 	.res	160,$00
+.segment	"ZEROPAGE"
 _plyr_pos:
 	.res	1,$00
 _temp_pos:
 	.res	1,$00
 _plyr_hp:
 	.res	1,$00
+.segment	"BSS"
 _mons_xy:
 	.res	3,$00
 _mons_hp:
@@ -327,8 +329,8 @@ M0003:
 	sta     _plyr_hp
 	cmp     #$00
 	bne     L0002
-	lda     #<(S0003)
-	ldx     #>(S0003)
+	lda     #<(S0005)
+	ldx     #>(S0005)
 	jsr     __puts
 	lda     #$71
 	sta     _k_input
@@ -431,7 +433,7 @@ M0001:
 	lda     #$0A
 	jsr     _itoa
 	ldy     #$03
-L0002:	lda     S0004,y
+L0002:	lda     S0006,y
 	sta     _stat_str,y
 	dey
 	bpl     L0002
@@ -483,8 +485,8 @@ L0008:	sta     (ptr1),y
 	clc
 	adc     M0001
 	bra     L001A
-L0004:	lda     #<(S0001)
-	ldx     #>(S0001)
+L0004:	lda     #<(S0003)
+	ldx     #>(S0003)
 	jsr     __puts
 	lda     #$19
 	sta     _plyr_pos
@@ -546,8 +548,8 @@ L000A:	jsr     _parsInpt
 	ldy     _plyr_pos
 	lda     #$40
 	sta     _map,y
-	lda     #<(S0002)
-	ldx     #>(S0002)
+	lda     #<(S0004)
+	ldx     #>(S0004)
 	jsr     __puts
 	jsr     _printMap
 	jsr     _prntStat

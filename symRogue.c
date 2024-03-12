@@ -16,10 +16,20 @@
 char t_str[4];
 char stat_str[20];
 unsigned char map[ MAP_SIZE ];
+#if SYM==1
+#pragma bss-name (push,"ZEROPAGE")
 unsigned char k_input = 0x00;
 unsigned char plyr_pos,
 	      temp_pos,
 	      plyr_hp;
+#pragma bss-name (pop)
+#else
+unsigned char k_input = 0x00;
+unsigned char plyr_pos,
+	      temp_pos,
+	      plyr_hp;
+#endif
+
 unsigned char mons_xy[ MONS_NUM ],
 	      mons_hp[ MONS_NUM ],
 	      mons_ch[ MONS_NUM ];
@@ -162,6 +172,7 @@ void updtMons()
 		/* check to see if monster is alive even */
 		if ( mons_ch[ i ] == '%' )
 			goto endDMons;
+		
 		switch ( dir )
 		{
 			case 0:
