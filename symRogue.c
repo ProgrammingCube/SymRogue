@@ -16,7 +16,8 @@
 unsigned char map[ MAP_SIZE ];
 unsigned char k_input = 0x00;
 unsigned char plyr_pos,
-	      temp_pos;
+	      temp_pos,
+	      plyr_hp;
 unsigned char mons_xy[ MONS_NUM ],
 	      mons_hp[ MONS_NUM ],
 	      mons_ch[ MONS_NUM ];
@@ -25,8 +26,8 @@ unsigned char mons_xy[ MONS_NUM ],
 void parsInpt();
 void updtPlyr();
 void updtMons();
-void monsCmbt();
-void plyrCmbt();
+void mtpCmbt();
+void ptmCmbt();
 void printMap();
 
 /* main func */
@@ -43,6 +44,7 @@ void main()
 
 	/* set up vars */
 	plyr_pos = 25;
+	plyr_hp  = P_MAX_HP;
 
 	/* initialize monsters */
 	for ( i = 0; i < MONS_NUM; i++)
@@ -54,6 +56,7 @@ void main()
 		while ( map[ mons_xy[i] ] != '.' );
 		mons_ch[ i ] = 'M';
 		map[ mons_xy[ i ] ] = mons_ch[ i ];
+		mons_hp[ i ] = M_MAX_HP;
 	}
 
 	/* game loop */
@@ -121,10 +124,10 @@ void updtPlyr()
 	/* check for monsters */
 	for ( i = 0; i < MONS_NUM; ++i)
 	{
-		if ( map[ temp_pos ] == mons_ch[ i ] )
+		if ( ( map[ temp_pos ] == mons_ch[ i ] ) && ( mons_ch[ i ] != '%' ) )
 		{
 			/* combat */
-			plyrCmbt();
+			ptmCmbt( i );
 			temp_pos = plyr_pos;
 		}
 	}
@@ -147,6 +150,9 @@ void updtMons()
 		unsigned char dir = rand() & 3;
 		unsigned char mtmp_pos;
 		mtmp_pos = mons_xy[ i ];
+		/* check to see if monster is alive even */
+		if ( mons_ch[ i ] == '%' )
+			continue;
 		switch ( dir )
 		{
 			case 0:
@@ -172,7 +178,7 @@ void updtMons()
 		if ( mtmp_pos == plyr_pos )
 		{
 			/* combat */
-			monsCmbt( i );
+			mtpCmbt();
 			mtmp_pos = mons_xy[ i ];
 		}
 		map[ mons_xy [ i ] ] = '.';
@@ -188,23 +194,31 @@ void updtMons()
 	}
 }
 
-/* void monsCmbt( i )
+/* void ptmCmbt( i )
  *
- * enters a combat routine for mons[ i ]
+ * enters player to monster combat for mons[ i ]
  */
-void monsCmbt( i )
+void ptmCmbt( i )
 unsigned char i;
 {
-
+	if ( ( mons_hp[ i ] -= PLYR_ATK ) <= 0 )
+	{
+		mons_ch[i] = '%';
+	}
 }
 
-/* void plyrCmbt()
+/* void mtpCmbt()
  *
  * enters monster to player combat
  */
-void plyrCmbt()
+void mtpCmbt()
 {
-
+	if ( ( plyr_hp -= MONS_ATK ) <= 0 )
+	{
+		/* quit */
+		puts("You died...");
+		k_input = 'q';
+	}
 }
 
 /* void printMap()

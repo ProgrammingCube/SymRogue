@@ -20,14 +20,15 @@
 	.export		_k_input
 	.export		_plyr_pos
 	.export		_temp_pos
+	.export		_plyr_hp
 	.export		_mons_xy
 	.export		_mons_hp
 	.export		_mons_ch
 	.export		_parsInpt
 	.export		_updtPlyr
 	.export		_updtMons
-	.export		_monsCmbt
-	.export		_plyrCmbt
+	.export		_mtpCmbt
+	.export		_ptmCmbt
 	.export		_printMap
 	.export		_main
 
@@ -38,6 +39,8 @@ _k_input:
 
 .segment	"RODATA"
 
+S0003:
+	.byte	$59,$6F,$75,$20,$64,$69,$65,$64,$2E,$2E,$2E,$00
 S0001:
 	.byte	$1B,$5B,$32,$4A,$00
 S0002:
@@ -50,6 +53,8 @@ _map:
 _plyr_pos:
 	.res	1,$00
 _temp_pos:
+	.res	1,$00
+_plyr_hp:
 	.res	1,$00
 _mons_xy:
 	.res	3,$00
@@ -151,24 +156,28 @@ L0003:	rts
 	ldy     _temp_pos
 	lda     _map,y
 	cmp     #$23
-	bne     L000D
+	bne     L0011
 	lda     _plyr_pos
 	sta     _temp_pos
-L000D:	stz     M0001
-L000E:	lda     M0001
+L0011:	stz     M0001
+L0012:	lda     M0001
 	cmp     #$03
 	bcs     L0006
 	ldy     _temp_pos
-	ldx     #$00
 	lda     _map,y
 	ldy     M0001
 	cmp     _mons_ch,y
-	bne     L000F
-	jsr     _plyrCmbt
+	bne     L0015
+	lda     _mons_ch,y
+	cmp     #$25
+	beq     L0015
+	ldx     #$00
+	lda     M0001
+	jsr     _ptmCmbt
 	lda     _plyr_pos
 	sta     _temp_pos
-L000F:	inc     M0001
-	bra     L000E
+L0015:	inc     M0001
+	bra     L0012
 L0006:	ldy     _temp_pos
 	lda     #$40
 	sta     _map,y
@@ -194,54 +203,57 @@ M0001:
 .segment	"CODE"
 
 	stz     M0001
-L001D:	lda     M0001
+L001F:	lda     M0001
 	cmp     #$03
-	jcs     L0023
+	jcs     L0026
 	jsr     _rand
 	and     #$03
 	sta     M0002
 	ldy     M0001
 	lda     _mons_xy,y
 	sta     M0003
+	ldy     M0001
+	lda     _mons_ch,y
+	cmp     #$25
+	jeq     L0025
 	lda     M0002
-	beq     L001E
-	cmp     #$01
-	beq     L001F
-	cmp     #$02
 	beq     L0020
-	cmp     #$03
+	cmp     #$01
 	beq     L0021
-	bra     L0008
-L001E:	lda     M0003
+	cmp     #$02
+	beq     L0022
+	cmp     #$03
+	beq     L0023
+	bra     L000A
+L0020:	lda     M0003
 	sec
 	sbc     #$10
 	sta     M0003
-	bra     L0008
-L001F:	dec     M0003
-	bra     L0008
-L0020:	lda     #$10
+	bra     L000A
+L0021:	dec     M0003
+	bra     L000A
+L0022:	lda     #$10
 	clc
 	adc     M0003
 	sta     M0003
-	bra     L0008
-L0021:	inc     M0003
-L0008:	ldy     M0003
+	bra     L000A
+L0023:	inc     M0003
+L000A:	ldy     M0003
+	ldx     #$00
 	lda     _map,y
 	cmp     #$23
-	bne     L0022
+	bne     L0024
 	ldy     M0001
 	lda     _mons_xy,y
 	sta     M0003
-L0022:	lda     M0003
+L0024:	lda     M0003
 	cmp     _plyr_pos
-	bne     L0011
-	ldx     #$00
-	lda     M0001
-	jsr     _monsCmbt
+	bne     L0013
+	jsr     _mtpCmbt
 	ldy     M0001
 	lda     _mons_xy,y
 	sta     M0003
-L0011:	ldy     M0001
+L0013:	ldy     M0001
 	lda     _mons_xy,y
 	clc
 	adc     #<(_map)
@@ -265,12 +277,12 @@ L0011:	ldy     M0001
 	ldy     M0001
 	lda     _mons_ch,y
 	sta     (ptr1)
-	inc     M0001
-	jmp     L001D
-L0023:	stz     M0001
-L0024:	lda     M0001
+L0025:	inc     M0001
+	jmp     L001F
+L0026:	stz     M0001
+L0027:	lda     M0001
 	cmp     #$03
-	bcs     L0018
+	bcs     L001A
 	ldy     M0001
 	lda     _mons_xy,y
 	clc
@@ -283,8 +295,8 @@ L0024:	lda     M0001
 	lda     _mons_ch,y
 	sta     (ptr1)
 	inc     M0001
-	bra     L0024
-L0018:	rts
+	bra     L0027
+L001A:	rts
 
 .segment	"BSS"
 
@@ -298,31 +310,60 @@ M0003:
 .endproc
 
 ; ---------------------------------------------------------------
-; void __near__ monsCmbt (unsigned char i)
+; void __near__ mtpCmbt (void)
 ; ---------------------------------------------------------------
 
 .segment	"CODE"
 
-.proc	_monsCmbt: near
+.proc	_mtpCmbt: near
 
 .segment	"CODE"
 
-	jsr     pusha
-	jmp     incsp1
+	lda     _plyr_hp
+	sec
+	sbc     #$05
+	sta     _plyr_hp
+	cmp     #$00
+	bne     L0002
+	lda     #<(S0003)
+	ldx     #>(S0003)
+	jsr     __puts
+	lda     #$71
+	sta     _k_input
+L0002:	rts
 
 .endproc
 
 ; ---------------------------------------------------------------
-; void __near__ plyrCmbt (void)
+; void __near__ ptmCmbt (unsigned char i)
 ; ---------------------------------------------------------------
 
 .segment	"CODE"
 
-.proc	_plyrCmbt: near
+.proc	_ptmCmbt: near
 
 .segment	"CODE"
 
-	rts
+	jsr     pusha
+	lda     #<(_mons_hp)
+	ldx     #>(_mons_hp)
+	clc
+	adc     (sp)
+	bcc     L0003
+	inx
+L0003:	sta     ptr1
+	stx     ptr1+1
+	lda     (ptr1)
+	sec
+	sbc     #$0A
+	sta     (ptr1)
+	cmp     #$00
+	bne     L0002
+	lda     (sp)
+	tay
+	lda     #$25
+	sta     _mons_ch,y
+L0002:	jmp     incsp1
 
 .endproc
 
@@ -379,7 +420,7 @@ L0002:	sta     _map,y
 	cpy     #$A0
 	bne     L0002
 	lda     #$11
-L0018:	sta     M0001
+L0019:	sta     M0001
 	cmp     #$90
 	bcs     L0004
 	lda     #<(_map)
@@ -398,15 +439,17 @@ L0008:	sta     (ptr1),y
 	lda     #$10
 	clc
 	adc     M0001
-	bra     L0018
+	bra     L0019
 L0004:	lda     #<(S0001)
 	ldx     #>(S0001)
 	jsr     __puts
 	lda     #$19
 	sta     _plyr_pos
+	lda     #$32
+	sta     _plyr_hp
 	stz     M0001
 	ldx     #$00
-L0019:	lda     M0001
+L001A:	lda     M0001
 	cmp     #$03
 	bcs     L000A
 L000D:	lda     #<(_mons_xy)
@@ -448,9 +491,12 @@ L0010:	jsr     pushax
 	ldy     M0001
 	lda     _mons_ch,y
 	sta     (ptr1)
+	ldy     M0001
+	lda     #$1E
+	sta     _mons_hp,y
 	ldx     #$00
 	inc     M0001
-	bra     L0019
+	bra     L001A
 L000A:	jsr     _parsInpt
 	jsr     _updtPlyr
 	jsr     _updtMons

@@ -1,7 +1,8 @@
-@echo off
+@echo on
 :: win build
 gcc symRogue.c -o win_build/symRogue.exe
 
+@echo off
 :: sym build
 :: make sure you have cc65 installed!
 :: change this to your cc65 root path (the one with all the folders and readme)
