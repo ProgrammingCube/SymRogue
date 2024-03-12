@@ -1,5 +1,3 @@
-#define	SYM	0
-
 #include "symRogue.h"
 
 /* constants */
@@ -101,6 +99,32 @@ void parsInpt()
 	}
 }
 
+/* void updtPlyr()
+ *
+ * updates player based upon temp_pos
+ */
+void updtPlyr()
+{
+	unsigned char i;
+	/* draw floor at current player */
+	map[ plyr_pos ] = '.';
+	/* check for walls */
+	if ( map[ temp_pos ] == '#' )
+		temp_pos = plyr_pos;
+	/* check for monsters */
+	for ( i = 0; i < MONS_NUM; ++i)
+	{
+		if ( map[ temp_pos ] == mons_ch[ i ] )
+		{
+			/* combat */
+			temp_pos = plyr_pos;
+		}
+	}
+	/* update player position to floor */
+	map[ temp_pos ] = '@';
+	plyr_pos = temp_pos;
+}
+
 /* void updtMons()
  *
  * updates monster
@@ -133,7 +157,11 @@ void updtMons()
 				break;
 		}
 
-		if ( map[ mtmp_pos ] == '#' || mtmp_pos == plyr_pos )
+		if ( map[ mtmp_pos ] == '#' )
+		{
+			mtmp_pos = mons_xy[ i ];
+		}
+		if ( mtmp_pos == plyr_pos )
 		{
 			mtmp_pos = mons_xy[ i ];
 		}
@@ -148,22 +176,6 @@ void updtMons()
 
 		map[ mons_xy[ i ] ] = mons_ch[ i ];
 	}
-}
-
-/* void updtPlyr()
- *
- * updates player based upon temp_pos
- */
-void updtPlyr()
-{
-	/* draw floor at current player */
-	map[ plyr_pos ] = '.';
-	/* check for walls */
-	if ( map[ temp_pos ] == '#' )
-		temp_pos = plyr_pos;
-	/* update player position to floor */
-	map[ temp_pos ] = '@';
-	plyr_pos = temp_pos;
 }
 
 /* void printMap()
