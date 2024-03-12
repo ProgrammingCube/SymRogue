@@ -124,7 +124,7 @@ void updtPlyr()
 	/* check for monsters */
 	for ( i = 0; i < MONS_NUM; ++i)
 	{
-		if ( ( map[ temp_pos ] == mons_ch[ i ] ) && ( mons_ch[ i ] != '%' ) )
+		if ( ( temp_pos == mons_xy[ i ] ) && ( mons_ch[ i ] != '%' ) )
 		{
 			/* combat */
 			ptmCmbt( i );

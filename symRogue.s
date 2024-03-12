@@ -156,28 +156,27 @@ L0003:	rts
 	ldy     _temp_pos
 	lda     _map,y
 	cmp     #$23
-	bne     L0011
+	bne     L0010
 	lda     _plyr_pos
 	sta     _temp_pos
-L0011:	stz     M0001
-L0012:	lda     M0001
+L0010:	stz     M0001
+L0011:	lda     M0001
 	cmp     #$03
 	bcs     L0006
-	ldy     _temp_pos
-	lda     _map,y
+	lda     _temp_pos
 	ldy     M0001
-	cmp     _mons_ch,y
-	bne     L0015
+	cmp     _mons_xy,y
+	bne     L0014
 	lda     _mons_ch,y
 	cmp     #$25
-	beq     L0015
+	beq     L0014
 	ldx     #$00
 	lda     M0001
 	jsr     _ptmCmbt
 	lda     _plyr_pos
 	sta     _temp_pos
-L0015:	inc     M0001
-	bra     L0012
+L0014:	inc     M0001
+	bra     L0011
 L0006:	ldy     _temp_pos
 	lda     #$40
 	sta     _map,y
