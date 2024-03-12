@@ -30,11 +30,11 @@ if exist symRogue.c (
 	%cc65dir%\bin\ca65 --cpu 65C02 symRogue.s
 	%cc65dir%\bin\ld65 -C %config% -m symRogue.map -o symRogue.bin symRogue.o %cc65dir%\lib\sym1.lib
 	if exist symRogue.bin (
-		%cc65dir%\bin\bin2hex symRogue.bin symRogue.hex > null
+		%cc65dir%\bin\bin2hex symRogue.bin sym_build\symRogue.hex > null
 	)
 
-	if exist symRogue.hex (
+	if exist sym_build\symRogue.hex (
 		echo --- symRogue.hex made ---
-		python hexptp.py symRogue.hex symRogue.ptp
+		python hexptp.py sym_build\symRogue.hex sym_build\symRogue.ptp
 	) else echo --- symRogue.hex FAIL ---
 )
