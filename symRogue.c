@@ -184,6 +184,10 @@ void updtMons()
 		{
 			mtmp_pos = mons_xy[ i ];
 		}
+		if ( map[ mtmp_pos ] == 'M' )
+		{
+			mtmp_pos = mons_xy[ i ];
+		}
 		if ( mtmp_pos == plyr_pos )
 		{
 			/* combat */
