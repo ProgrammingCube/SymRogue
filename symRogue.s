@@ -13,13 +13,11 @@
 	.forceimport	__STARTUP__
 	.import		_putchar
 	.import		_getchar
-	.import		_memcpy
 	.import		_memset
 	.import		_rand
 	.import		_itoa
 	.export		__puts
 	.export		_t_str
-	.export		_stat_str
 	.export		_map
 	.export		_k_input
 	.export		_plyr_pos
@@ -57,8 +55,6 @@ S0004:
 
 _t_str:
 	.res	4,$00
-_stat_str:
-	.res	20,$00
 _map:
 	.res	160,$00
 .segment	"ZEROPAGE"
@@ -432,18 +428,11 @@ M0001:
 	ldx     #$00
 	lda     #$0A
 	jsr     _itoa
-	ldy     #$03
-L0002:	lda     S0006,y
-	sta     _stat_str,y
-	dey
-	bpl     L0002
-	ldy     #$03
-L0003:	lda     _t_str,y
-	sta     _stat_str+4,y
-	dey
-	bpl     L0003
-	lda     #<(_stat_str)
-	ldx     #>(_stat_str)
+	lda     #<(S0006)
+	ldx     #>(S0006)
+	jsr     __puts
+	lda     #<(_t_str)
+	ldx     #>(_t_str)
 	jmp     __puts
 
 .endproc

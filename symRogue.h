@@ -9,7 +9,6 @@
 #include <stdlib.h>
 /* core func overrides */
 #define input()		getchar()
-#define	puts(s)		_puts(s)
 /* misc defines */
 #define	newline()	putchar('\n');putchar('\r')
 #define	clrdraw()	puts("\033[2J")
@@ -31,8 +30,9 @@
 
 #endif
 
+#define	puts(s)		_puts(s)
+
 /* declare overridden funcs */
-#if ( SYM == 1 )
 void _puts( s )
 char* s;
 {
@@ -40,8 +40,5 @@ char* s;
 	while ( *p )
 		putchar( *p++ );
 }
-
-#endif
-
 
 #endif

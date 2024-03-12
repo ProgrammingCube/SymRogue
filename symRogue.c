@@ -14,7 +14,6 @@
 
 /* globals */
 char t_str[4];
-char stat_str[20];
 unsigned char map[ MAP_SIZE ];
 #if SYM==1
 #pragma bss-name (push,"ZEROPAGE")
@@ -263,7 +262,6 @@ void printMap()
 void prntStat()
 {
 	itoa( plyr_hp, t_str, 10 );
-	memcpy( stat_str, "HP:\t", 4 );
-	memcpy( stat_str + 4, t_str, 4 );
-	puts( stat_str );
+	puts("HP:\t");
+	puts( t_str );
 }
