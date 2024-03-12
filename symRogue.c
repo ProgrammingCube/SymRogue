@@ -20,13 +20,15 @@ unsigned char map[ MAP_SIZE ];
 unsigned char k_input = 0x00;
 unsigned char plyr_pos,
 	      temp_pos,
-	      plyr_hp;
+	      plyr_hp,
+	      g_i;
 #pragma bss-name (pop)
 #else
 unsigned char k_input = 0x00;
 unsigned char plyr_pos,
 	      temp_pos,
-	      plyr_hp;
+	      plyr_hp,
+	      g_i;
 #endif
 
 unsigned char mons_xy[ MONS_NUM ],
@@ -45,11 +47,10 @@ void prntStat();
 /* main func */
 void main()
 {
-	unsigned char i;
 	/* create map */
 	memset( map, '#', MAP_SIZE );
-	for ( i = ROW_LEN + 1; i < MAP_SIZE - ROW_LEN; i += ROW_LEN )
-		memset( map + i, '.', ROW_LEN - 2 );
+	for ( g_i = ROW_LEN + 1; g_i < MAP_SIZE - ROW_LEN; g_i += ROW_LEN )
+		memset( map + g_i, '.', ROW_LEN - 2 );
 	
 	/* clear screen once first */
 	clrdraw();
@@ -59,16 +60,16 @@ void main()
 	plyr_hp  = P_MAX_HP;
 
 	/* initialize monsters */
-	for ( i = 0; i < MONS_NUM; i++)
+	for ( g_i = 0; g_i < MONS_NUM; ++g_i)
 	{
 		do
 		{
-			mons_xy[ i ] = rand() % MAP_SIZE;
+			mons_xy[ g_i ] = rand() % MAP_SIZE;
 		}
-		while ( map[ mons_xy[i] ] != '.' );
-		mons_ch[ i ] = 'M';
-		map[ mons_xy[ i ] ] = mons_ch[ i ];
-		mons_hp[ i ] = M_MAX_HP;
+		while ( map[ mons_xy[ g_i ] ] != '.' );
+		mons_ch[ g_i ] = 'M';
+		map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
+		mons_hp[ g_i ] = M_MAX_HP;
 	}
 
 	/* game loop */
@@ -140,12 +141,13 @@ void updtPlyr()
 	if ( map[ temp_pos ] == '#' )
 		temp_pos = plyr_pos;
 	/* check for monsters */
-	for ( i = 0; i < MONS_NUM; ++i)
+	for ( g_i = 0; g_i < MONS_NUM; ++g_i)
 	{
-		if ( ( temp_pos == mons_xy[ i ] ) && ( mons_ch[ i ] != '%' ) )
+		if ( ( temp_pos == mons_xy[ g_i ] )
+			&& ( mons_ch[ g_i ] != '%' ) )
 		{
 			/* combat */
-			ptmCmbt( i );
+			ptmCmbt( g_i );
 			temp_pos = plyr_pos;
 		}
 	}
@@ -160,16 +162,14 @@ void updtPlyr()
  */
 void updtMons()
 {
-	unsigned char i;
-
-	for ( i = 0; i < MONS_NUM; ++i )
+	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
 	{
 		/* generate random position */
 		unsigned char dir = rand() & 3;
 		unsigned char mtmp_pos;
-		mtmp_pos = mons_xy[ i ];
+		mtmp_pos = mons_xy[ g_i ];
 		/* check to see if monster is alive even */
-		if ( mons_ch[ i ] == '%' )
+		if ( mons_ch[ g_i ] == '%' )
 			goto endDMons;
 		
 		switch ( dir )
@@ -192,22 +192,22 @@ void updtMons()
 
 		if ( map[ mtmp_pos ] == '#' )
 		{
-			mtmp_pos = mons_xy[ i ];
+			mtmp_pos = mons_xy[ g_i ];
 		}
 		if ( map[ mtmp_pos ] == 'M' )
 		{
-			mtmp_pos = mons_xy[ i ];
+			mtmp_pos = mons_xy[ g_i ];
 		}
 		if ( mtmp_pos == plyr_pos )
 		{
 			/* combat */
 			mtpCmbt();
-			mtmp_pos = mons_xy[ i ];
+			mtmp_pos = mons_xy[ g_i ];
 		}
-		map[ mons_xy [ i ] ] = '.';
-		mons_xy[ i ] = mtmp_pos;
+		map[ mons_xy [ g_i ] ] = '.';
+		mons_xy[ g_i ] = mtmp_pos;
 endDMons:
-		map[ mons_xy[ i ] ] = mons_ch[ i ];
+		map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
 	}
 }
 
@@ -220,7 +220,7 @@ unsigned char i;
 {
 	if ( ( mons_hp[ i ] -= PLYR_ATK ) <= 0 )
 	{
-		mons_ch[i] = '%';
+		mons_ch[ i ] = '%';
 	}
 }
 
@@ -244,11 +244,10 @@ void mtpCmbt()
  */
 void printMap()
 {
-	unsigned char i;
-	for ( i = 0; i < MAP_SIZE; ++i )
+	for ( g_i = 0; g_i < MAP_SIZE; ++g_i )
 	{
-		putchar( map[ i ] );
-		if ( ! ( ( i + 1 ) & ( ROW_MASK ) ) )
+		putchar( map[ g_i ] );
+		if ( ! ( ( g_i + 1 ) & ( ROW_MASK ) ) )
 		{
 			newline();
 		}
