@@ -71,6 +71,9 @@ void main()
 		/* monster routines */
 		updtMons();
 
+		/* update player position AFTER all updates */
+		map[ plyr_pos ] = '@';
+
 		/* draw screen */
 		clrscr();
 		printMap();
@@ -131,8 +134,8 @@ void updtPlyr()
 			temp_pos = plyr_pos;
 		}
 	}
+
 	/* update player position to floor */
-	map[ temp_pos ] = '@';
 	plyr_pos = temp_pos;
 }
 
@@ -152,7 +155,7 @@ void updtMons()
 		mtmp_pos = mons_xy[ i ];
 		/* check to see if monster is alive even */
 		if ( mons_ch[ i ] == '%' )
-			continue;
+			goto endDMons;
 		switch ( dir )
 		{
 			case 0:
@@ -183,13 +186,7 @@ void updtMons()
 		}
 		map[ mons_xy [ i ] ] = '.';
 		mons_xy[ i ] = mtmp_pos;
-		map[ mons_xy[ i ] ] = mons_ch[ i ];
-	}
-
-	/* print monsters to map */
-	for ( i = 0; i < MONS_NUM; ++i )
-	{
-
+endDMons:
 		map[ mons_xy[ i ] ] = mons_ch[ i ];
 	}
 }
