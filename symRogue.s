@@ -15,6 +15,7 @@
 	.import		_getchar
 	.import		_memset
 	.import		_rand
+	.import		_abs
 	.import		_itoa
 	.export		__puts
 	.export		_t_str
@@ -193,11 +194,6 @@ L0014:	lda     _temp_pos
 	sta     _plyr_pos
 	rts
 
-.segment	"BSS"
-
-M0001:
-	.res	1,$00
-
 .endproc
 
 ; ---------------------------------------------------------------
@@ -211,65 +207,164 @@ M0001:
 .segment	"CODE"
 
 	stz     _g_i
-L001D:	lda     _g_i
+L0033:	lda     _g_i
 	cmp     #$03
-	bcc     L0023
+	bcc     L003D
 	rts
-L0023:	jsr     _rand
+L003D:	lda     _plyr_pos
+	and     #$0F
+	sta     M0003
+	lda     _plyr_pos
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     M0004
+	ldy     _g_i
+	lda     _mons_xy,y
+	and     #$0F
+	sta     M0005
+	ldy     _g_i
+	lda     _mons_xy,y
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	sta     M0006
+	ldy     _g_i
+	lda     _mons_ch,y
+	cmp     #$25
+	jeq     L000A
+	ldy     _g_i
+	lda     _mons_xy,y
+	and     #$0F
+	jsr     pusha0
+	lda     _plyr_pos
+	and     #$0F
+	jsr     tossuba0
+	cmp     #$05
+	txa
+	sbc     #$00
+	bvc     L000D
+	eor     #$80
+L000D:	asl     a
+	lda     #$00
+	tax
+	rol     a
+	jsr     _abs
+	stx     tmp1
+	ora     tmp1
+	jeq     L000B
+	ldy     _g_i
+	lda     _mons_xy,y
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	jsr     pusha0
+	lda     _plyr_pos
+	lsr     a
+	lsr     a
+	lsr     a
+	lsr     a
+	jsr     tossuba0
+	cmp     #$05
+	txa
+	sbc     #$00
+	bvc     L0010
+	eor     #$80
+L0010:	asl     a
+	lda     #$00
+	tax
+	rol     a
+	jsr     _abs
+	stx     tmp1
+	ora     tmp1
+	beq     L000B
+	jsr     _rand
+	and     #$01
+	bne     L000B
+	ldy     _g_i
+	lda     _mons_xy,y
+	sta     M0002
+	lda     M0004
+	cmp     M0006
+	bcc     L0034
+	beq     L0034
+	lda     #$10
+	bra     L0032
+L0034:	lda     M0003
+	cmp     M0005
+	bcc     L0035
+	beq     L0035
+	lda     #$01
+	bra     L0032
+L0035:	lda     M0004
+	cmp     M0006
+	bcs     L0036
+	lda     #$F0
+	bra     L0032
+L0036:	lda     M0003
+	cmp     M0005
+	bcs     L0037
+	lda     #$FF
+L0032:	sta     M0001
+L0037:	lda     M0001
+	clc
+	adc     M0002
+	sta     M0002
+	bra     L001D
+L000B:	jsr     _rand
 	and     #$03
 	sta     M0001
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-	ldy     _g_i
-	lda     _mons_ch,y
-	cmp     #$25
-	jeq     L0009
 	lda     M0001
-	beq     L001E
+	beq     L0038
 	cmp     #$01
-	beq     L001F
+	beq     L0039
 	cmp     #$02
-	beq     L0020
+	beq     L003A
 	cmp     #$03
-	beq     L0021
-	bra     L000B
-L001E:	lda     M0002
+	beq     L003B
+	bra     L001D
+L0038:	lda     M0002
 	sec
 	sbc     #$10
 	sta     M0002
-	bra     L000B
-L001F:	dec     M0002
-	bra     L000B
-L0020:	lda     #$10
+	bra     L001D
+L0039:	dec     M0002
+	bra     L001D
+L003A:	lda     #$10
 	clc
 	adc     M0002
 	sta     M0002
-	bra     L000B
-L0021:	inc     M0002
-L000B:	ldy     M0002
+	bra     L001D
+L003B:	inc     M0002
+L001D:	ldy     M0002
 	lda     _map,y
 	cmp     #$23
-	bne     L0011
+	bne     L0026
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L0011:	ldy     M0002
+L0026:	ldy     M0002
 	ldx     #$00
 	lda     _map,y
 	cmp     #$4D
-	bne     L0022
+	bne     L003C
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L0022:	lda     M0002
+L003C:	lda     M0002
 	cmp     _plyr_pos
-	bne     L0017
+	bne     L002C
 	jsr     _mtpCmbt
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L0017:	ldy     _g_i
+L002C:	ldy     _g_i
 	lda     _mons_xy,y
 	clc
 	adc     #<(_map)
@@ -282,7 +377,7 @@ L0017:	ldy     _g_i
 	ldy     _g_i
 	lda     M0002
 	sta     _mons_xy,y
-L0009:	ldy     _g_i
+L000A:	ldy     _g_i
 	lda     _mons_xy,y
 	clc
 	adc     #<(_map)
@@ -294,11 +389,13 @@ L0009:	ldy     _g_i
 	lda     _mons_ch,y
 	sta     (ptr1)
 	inc     _g_i
-	jmp     L001D
+	jmp     L0033
 
 .segment	"RODATA"
 
-M0003:
+M0008:
+	.word	$0000
+M0007:
 	.word	$0000
 
 .segment	"BSS"
@@ -306,6 +403,14 @@ M0003:
 M0001:
 	.res	1,$00
 M0002:
+	.res	1,$00
+M0003:
+	.res	1,$00
+M0004:
+	.res	1,$00
+M0005:
+	.res	1,$00
+M0006:
 	.res	1,$00
 
 .endproc

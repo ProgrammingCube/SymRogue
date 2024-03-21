@@ -134,7 +134,6 @@ void parsInpt()
  */
 void updtPlyr()
 {
-	unsigned char i;
 	/* draw floor at current player */
 	map[ plyr_pos ] = '.';
 	/* check for walls */
@@ -164,30 +163,57 @@ void updtMons()
 {
 	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
 	{
-		/* generate random position */
-		unsigned char dir = rand() & 3;
-		unsigned char mtmp_pos;
-		mtmp_pos = mons_xy[ g_i ];
+		char dir,
+		     mtmp_pos;
+
+		unsigned char px = plyr_pos % ROW_LEN;  // Player X position
+		unsigned char py = plyr_pos / ROW_LEN;  // Player Y position
+		unsigned char mx = mons_xy[g_i] % ROW_LEN;  // Monster X position
+		unsigned char my = mons_xy[g_i] / ROW_LEN;  // Monster Y position
+
 		/* check to see if monster is alive even */
 		if ( mons_ch[ g_i ] == '%' )
 			goto endDMons;
-		
-		switch ( dir )
+		/* 50% chance of moving toward you if < 5 in square */
+		if ( abs( ( mons_xy[ g_i ] % ROW_LEN ) - ( plyr_pos % ROW_LEN ) < 5 ) &&
+		     abs( ( mons_xy[ g_i ] / ROW_LEN ) - ( plyr_pos / ROW_LEN ) < 5 ) )
 		{
-			case 0:
-				mtmp_pos -= ROW_LEN;
-				break;
-			case 1:
-				mtmp_pos--;
-				break;
-			case 2:
-				mtmp_pos += ROW_LEN;
-				break;
-			case 3:
-				mtmp_pos++;
-				break;
-			default:
-				break;
+			if ( ( rand() & 1 ) )
+				goto m_randMv;
+			mtmp_pos = mons_xy[ g_i ];
+			if ( py > my )
+				dir = ROW_LEN;
+			else if ( px > mx )
+				dir = 1;
+			else if ( py < my )
+				dir = -ROW_LEN;
+			else if ( px < mx )
+				dir = -1;
+			mtmp_pos += dir;
+		}
+		else
+		{
+m_randMv:
+			/* generate random position */
+			dir = rand() & 3;
+			mtmp_pos = mons_xy[ g_i ];
+			switch ( dir )
+			{
+				case 0:
+					mtmp_pos -= ROW_LEN;
+					break;
+				case 1:
+					mtmp_pos--;
+					break;
+				case 2:
+					mtmp_pos += ROW_LEN;
+					break;
+				case 3:
+					mtmp_pos++;
+					break;
+				default:
+					break;
+			}
 		}
 
 		if ( map[ mtmp_pos ] == '#' )
