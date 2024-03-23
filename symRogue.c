@@ -163,8 +163,8 @@ void updtMons()
 {
 	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
 	{
-		char dir,
-		     mtmp_pos;
+		char dir;
+		unsigned char mtmp_pos;
 
 		unsigned char px = plyr_pos % ROW_LEN;  // Player X position
 		unsigned char py = plyr_pos / ROW_LEN;  // Player Y position
