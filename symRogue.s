@@ -12,6 +12,7 @@
 	.macpack	longbranch
 	.forceimport	__STARTUP__
 	.import		_putchar
+	.import		_printf
 	.import		_getchar
 	.import		_memset
 	.import		_rand
@@ -47,10 +48,13 @@ _k_input:
 .segment	"RODATA"
 
 S0005:
+	.byte	$4D,$6F,$6E,$73,$74,$65,$72,$20,$63,$6F,$6C,$6C,$69,$73,$69,$6F
+	.byte	$6E,$3A,$20,$25,$64,$0A,$00
+S0006:
 	.byte	$59,$6F,$75,$20,$64,$69,$65,$64,$2E,$2E,$2E,$00
 S0003:
 	.byte	$1B,$5B,$32,$4A,$00
-S0006:
+S0007:
 	.byte	$48,$50,$3A,$09,$00
 S0004:
 	.byte	$1B,$5B,$48,$00
@@ -211,11 +215,11 @@ L0014:	lda     _temp_pos
 .segment	"CODE"
 
 	stz     _g_i
-L002C:	lda     _g_i
+L002B:	lda     _g_i
 	cmp     #$06
-	bcc     L0039
+	bcc     L0038
 	rts
-L0039:	lda     _plyr_pos
+L0038:	lda     _plyr_pos
 	and     #$0F
 	sta     M0002
 	lda     _plyr_pos
@@ -241,7 +245,7 @@ L0039:	lda     _plyr_pos
 	ldy     _g_i
 	lda     _mons_ch,y
 	cmp     #$25
-	jeq     L0038
+	jeq     L0037
 	lda     M0004
 	sec
 	sbc     M0002
@@ -277,78 +281,87 @@ L000E:	bpl     L000B
 	bne     L000B
 	lda     M0003
 	cmp     M0005
-	bcc     L0030
-	beq     L0030
+	bcc     L002F
+	beq     L002F
 	lda     #$10
 	clc
 	adc     _mtmp_pos
 	sta     _mtmp_pos
-	bra     L001A
-L0030:	lda     M0002
+	bra     L0030
+L002F:	lda     M0002
 	cmp     M0004
-	bcc     L0031
-	bne     L0036
-L0031:	lda     M0003
+	bcc     L0030
+	beq     L0030
+	inc     _mtmp_pos
+L0030:	lda     M0003
 	cmp     M0005
-	bcs     L0032
+	bcs     L0031
 	lda     _mtmp_pos
 	sec
 	sbc     #$10
 	sta     _mtmp_pos
-	bra     L001A
-L0032:	lda     M0002
+	bra     L0019
+L0031:	lda     M0002
 	cmp     M0004
-	bcs     L001A
+	bcs     L0019
 	dec     _mtmp_pos
-	bra     L001A
+	bra     L0019
 L000B:	jsr     _rand
 	and     #$03
 	sta     M0001
 	lda     M0001
-	beq     L0033
+	beq     L0032
 	cmp     #$01
-	beq     L0034
+	beq     L0033
 	cmp     #$02
-	beq     L0035
+	beq     L0034
 	cmp     #$03
-	beq     L0036
-	bra     L001A
-L0033:	lda     _mtmp_pos
+	beq     L0035
+	bra     L0019
+L0032:	lda     _mtmp_pos
 	sec
 	sbc     #$10
 	sta     _mtmp_pos
-	bra     L001A
-L0034:	dec     _mtmp_pos
-	bra     L001A
-L0035:	lda     #$10
+	bra     L0019
+L0033:	dec     _mtmp_pos
+	bra     L0019
+L0034:	lda     #$10
 	clc
 	adc     _mtmp_pos
 	sta     _mtmp_pos
-	bra     L001A
-L0036:	inc     _mtmp_pos
-L001A:	ldy     _mtmp_pos
+	bra     L0019
+L0035:	inc     _mtmp_pos
+L0019:	ldy     _mtmp_pos
 	lda     _map,y
 	cmp     #$23
-	bne     L0022
+	bne     L0021
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     _mtmp_pos
-L0022:	ldy     _mtmp_pos
+L0021:	ldy     _mtmp_pos
 	ldx     #$00
 	lda     _map,y
 	cmp     #$4D
-	bne     L0037
+	bne     L0036
+	lda     #<(S0005)
+	ldx     #>(S0005)
+	jsr     pushax
+	lda     _g_i
+	jsr     pusha0
+	ldy     #$04
+	jsr     _printf
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     _mtmp_pos
-L0037:	lda     _mtmp_pos
+	ldx     #$00
+L0036:	lda     _mtmp_pos
 	cmp     _plyr_pos
-	bne     L0028
+	bne     L0027
 	jsr     _mtpCmbt
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     _mtmp_pos
-L0028:	ldy     _g_i
+L0027:	ldy     _g_i
 	lda     _mons_xy,y
 	clc
 	adc     #<(_map)
@@ -361,8 +374,8 @@ L0028:	ldy     _g_i
 	ldy     _g_i
 	lda     _mtmp_pos
 	sta     _mons_xy,y
-L0038:	inc     _g_i
-	jmp     L002C
+L0037:	inc     _g_i
+	jmp     L002B
 
 .segment	"RODATA"
 
@@ -456,8 +469,8 @@ L000B:	rts
 	sta     _plyr_hp
 	cmp     #$00
 	bne     L0002
-	lda     #<(S0005)
-	ldx     #>(S0005)
+	lda     #<(S0006)
+	ldx     #>(S0006)
 	jsr     __puts
 	lda     #$71
 	sta     _k_input
@@ -554,8 +567,8 @@ L0003:	rts
 	ldx     #$00
 	lda     #$0A
 	jsr     _itoa
-	lda     #<(S0006)
-	ldx     #>(S0006)
+	lda     #<(S0007)
+	ldx     #>(S0007)
 	jsr     __puts
 	lda     #<(_t_str)
 	ldx     #>(_t_str)

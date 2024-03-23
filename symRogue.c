@@ -186,7 +186,7 @@ void updtMons()
 				mtmp_pos += ROW_LEN;
 			else if ( px > mx )
 				mtmp_pos++;
-			else if ( py < my )
+			if ( py < my )
 				mtmp_pos -= ROW_LEN;
 			else if ( px < mx )
 				mtmp_pos--;
@@ -218,10 +218,12 @@ m_randMv:
 		{
 			mtmp_pos = mons_xy[ g_i ];
 		}
+
 		if ( map[ mtmp_pos ] == 'M' )
 		{
 			mtmp_pos = mons_xy[ g_i ];
 		}
+
 		if ( mtmp_pos == plyr_pos )
 		{
 			/* combat */
