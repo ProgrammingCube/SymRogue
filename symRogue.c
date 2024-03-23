@@ -86,10 +86,20 @@ void main()
 
 		/* monster routines */
 		updtMons();
-		
-		drawMons();
+
 		/* update player position AFTER all updates */
 		map[ plyr_pos ] = '@';
+		
+		for ( g_i = 0; g_i < MONS_NUM; ++g_i )
+		{
+			if ( mons_ch[ g_i ] == '%' )
+			{
+				if ( map[ mons_xy[ g_i ] ] == '.' )
+				{
+					map[ mons_xy[ g_i ] ] = '%';
+				}
+			}
+		}
 
 		/* draw screen */
 		clrscr();
@@ -168,10 +178,13 @@ void updtMons()
 	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
 	{
 		char dir;
+		unsigned char mtmp_pos;
+
 		unsigned char px = plyr_pos % ROW_LEN;  // Player X position
 		unsigned char py = plyr_pos / ROW_LEN;  // Player Y position
 		unsigned char mx = mons_xy[g_i] % ROW_LEN;  // Monster X position
 		unsigned char my = mons_xy[g_i] / ROW_LEN;  // Monster Y position
+
 		mtmp_pos = mons_xy[ g_i ];
 		
 		/* check to see if monster is alive even */
@@ -186,7 +199,7 @@ void updtMons()
 				mtmp_pos += ROW_LEN;
 			else if ( px > mx )
 				mtmp_pos++;
-			if ( py < my )
+			else if ( py < my )
 				mtmp_pos -= ROW_LEN;
 			else if ( px < mx )
 				mtmp_pos--;
@@ -218,12 +231,10 @@ m_randMv:
 		{
 			mtmp_pos = mons_xy[ g_i ];
 		}
-
 		if ( map[ mtmp_pos ] == 'M' )
 		{
 			mtmp_pos = mons_xy[ g_i ];
 		}
-
 		if ( mtmp_pos == plyr_pos )
 		{
 			/* combat */
@@ -232,29 +243,10 @@ m_randMv:
 		}
 		map[ mons_xy [ g_i ] ] = '.';
 		mons_xy[ g_i ] = mtmp_pos;
+		map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
 	}
 }
 
-/* void drawMons()
- *
- * draw monsters corpse-first
- */
-void drawMons()
-{
-	/* draw corpses */
-	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
-	{
-		if ( mons_ch[ g_i ] == '%' )
-			map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
-	}
-	
-	/* draw living monsters */
-	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
-	{
-		if ( mons_ch[ g_i ] == 'M' )
-			map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
-	}
-}
 
 /* void ptmCmbt( i )
  *
