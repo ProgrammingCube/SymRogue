@@ -175,8 +175,7 @@ void updtMons()
 		if ( mons_ch[ g_i ] == '%' )
 			goto endDMons;
 		/* 50% chance of moving toward you if < 5 in square */
-		if ( abs( ( mons_xy[ g_i ] % ROW_LEN ) - ( plyr_pos % ROW_LEN ) < 5 ) &&
-		     abs( ( mons_xy[ g_i ] / ROW_LEN ) - ( plyr_pos / ROW_LEN ) < 5 ) )
+		if ( ( abs( mx - px ) < 5 ) && ( abs( my - py ) < 5 ) )
 		{
 			if ( ( rand() & 1 ) )
 				goto m_randMv;
@@ -215,7 +214,6 @@ m_randMv:
 					break;
 			}
 		}
-
 		if ( map[ mtmp_pos ] == '#' )
 		{
 			mtmp_pos = mons_xy[ g_i ];

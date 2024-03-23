@@ -207,11 +207,11 @@ L0014:	lda     _temp_pos
 .segment	"CODE"
 
 	stz     _g_i
-L0033:	lda     _g_i
+L0032:	lda     _g_i
 	cmp     #$03
-	bcc     L003D
+	bcc     L003F
 	rts
-L003D:	lda     _plyr_pos
+L003F:	lda     _plyr_pos
 	and     #$0F
 	sta     M0003
 	lda     _plyr_pos
@@ -235,52 +235,36 @@ L003D:	lda     _plyr_pos
 	lda     _mons_ch,y
 	cmp     #$25
 	jeq     L000A
-	ldy     _g_i
-	lda     _mons_xy,y
-	and     #$0F
-	jsr     pusha0
-	lda     _plyr_pos
-	and     #$0F
-	jsr     tossuba0
+	lda     M0005
+	sec
+	sbc     M0003
+	pha
+	lda     #$00
+	sbc     #$00
+	tax
+	pla
+	jsr     _abs
 	cmp     #$05
 	txa
 	sbc     #$00
-	bvc     L000D
+	bvc     L000C
 	eor     #$80
-L000D:	asl     a
+L000C:	bpl     L000B
+	lda     M0006
+	sec
+	sbc     M0004
+	pha
 	lda     #$00
+	sbc     #$00
 	tax
-	rol     a
+	pla
 	jsr     _abs
-	stx     tmp1
-	ora     tmp1
-	jeq     L000B
-	ldy     _g_i
-	lda     _mons_xy,y
-	lsr     a
-	lsr     a
-	lsr     a
-	lsr     a
-	jsr     pusha0
-	lda     _plyr_pos
-	lsr     a
-	lsr     a
-	lsr     a
-	lsr     a
-	jsr     tossuba0
 	cmp     #$05
 	txa
 	sbc     #$00
-	bvc     L0010
+	bvc     L000E
 	eor     #$80
-L0010:	asl     a
-	lda     #$00
-	tax
-	rol     a
-	jsr     _abs
-	stx     tmp1
-	ora     tmp1
-	beq     L000B
+L000E:	bpl     L000B
 	jsr     _rand
 	and     #$01
 	bne     L000B
@@ -289,31 +273,31 @@ L0010:	asl     a
 	sta     M0002
 	lda     M0004
 	cmp     M0006
-	bcc     L0034
-	beq     L0034
+	bcc     L0036
+	beq     L0036
 	lda     #$10
-	bra     L0032
-L0034:	lda     M0003
-	cmp     M0005
-	bcc     L0035
-	beq     L0035
-	lda     #$01
-	bra     L0032
-L0035:	lda     M0004
-	cmp     M0006
-	bcs     L0036
-	lda     #$F0
-	bra     L0032
+	bra     L0031
 L0036:	lda     M0003
 	cmp     M0005
-	bcs     L0037
+	bcc     L0037
+	beq     L0037
+	lda     #$01
+	bra     L0031
+L0037:	lda     M0004
+	cmp     M0006
+	bcs     L0038
+	lda     #$F0
+	bra     L0031
+L0038:	lda     M0003
+	cmp     M0005
+	bcs     L0039
 	lda     #$FF
-L0032:	sta     M0001
-L0037:	lda     M0001
+L0031:	sta     M0001
+L0039:	lda     M0001
 	clc
 	adc     M0002
 	sta     M0002
-	bra     L001D
+	bra     L001B
 L000B:	jsr     _rand
 	and     #$03
 	sta     M0001
@@ -321,50 +305,50 @@ L000B:	jsr     _rand
 	lda     _mons_xy,y
 	sta     M0002
 	lda     M0001
-	beq     L0038
-	cmp     #$01
-	beq     L0039
-	cmp     #$02
 	beq     L003A
-	cmp     #$03
+	cmp     #$01
 	beq     L003B
-	bra     L001D
-L0038:	lda     M0002
+	cmp     #$02
+	beq     L003C
+	cmp     #$03
+	beq     L003D
+	bra     L001B
+L003A:	lda     M0002
 	sec
 	sbc     #$10
 	sta     M0002
-	bra     L001D
-L0039:	dec     M0002
-	bra     L001D
-L003A:	lda     #$10
+	bra     L001B
+L003B:	dec     M0002
+	bra     L001B
+L003C:	lda     #$10
 	clc
 	adc     M0002
 	sta     M0002
-	bra     L001D
-L003B:	inc     M0002
-L001D:	ldy     M0002
+	bra     L001B
+L003D:	inc     M0002
+L001B:	ldy     M0002
 	lda     _map,y
 	cmp     #$23
-	bne     L0026
+	bne     L0025
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L0026:	ldy     M0002
+L0025:	ldy     M0002
 	ldx     #$00
 	lda     _map,y
 	cmp     #$4D
-	bne     L003C
+	bne     L003E
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L003C:	lda     M0002
+L003E:	lda     M0002
 	cmp     _plyr_pos
-	bne     L002C
+	bne     L002B
 	jsr     _mtpCmbt
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L002C:	ldy     _g_i
+L002B:	ldy     _g_i
 	lda     _mons_xy,y
 	clc
 	adc     #<(_map)
@@ -389,11 +373,13 @@ L000A:	ldy     _g_i
 	lda     _mons_ch,y
 	sta     (ptr1)
 	inc     _g_i
-	jmp     L0033
+	jmp     L0032
 
 .segment	"RODATA"
 
 M0008:
+	.word	$0000
+M0009:
 	.word	$0000
 M0007:
 	.word	$0000
