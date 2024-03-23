@@ -169,29 +169,32 @@ L0003:	rts
 	ldy     _temp_pos
 	lda     _map,y
 	cmp     #$23
-	bne     L000F
+	bne     L0010
 	lda     _plyr_pos
 	sta     _temp_pos
-L000F:	stz     _g_i
-L0010:	lda     _g_i
+L0010:	stz     _g_i
+L0011:	lda     _g_i
 	cmp     #$03
-	bcs     L0014
+	bcs     L0015
 	lda     _temp_pos
 	ldy     _g_i
 	cmp     _mons_xy,y
-	bne     L0013
+	bne     L0014
 	lda     _mons_ch,y
 	cmp     #$25
-	beq     L0013
+	beq     L0014
 	ldx     #$00
 	lda     _g_i
 	jsr     _ptmCmbt
 	lda     _plyr_pos
 	sta     _temp_pos
-L0013:	inc     _g_i
-	bra     L0010
-L0014:	lda     _temp_pos
+L0014:	inc     _g_i
+	bra     L0011
+L0015:	lda     _temp_pos
 	sta     _plyr_pos
+	ldy     _plyr_pos
+	lda     #$40
+	sta     _map,y
 	rts
 
 .endproc
@@ -207,11 +210,11 @@ L0014:	lda     _temp_pos
 .segment	"CODE"
 
 	stz     _g_i
-L0032:	lda     _g_i
+L0030:	lda     _g_i
 	cmp     #$03
-	bcc     L003F
+	bcc     L003C
 	rts
-L003F:	lda     _plyr_pos
+L003C:	lda     _plyr_pos
 	and     #$0F
 	sta     M0003
 	lda     _plyr_pos
@@ -273,30 +276,29 @@ L000E:	bpl     L000B
 	sta     M0002
 	lda     M0004
 	cmp     M0006
-	bcc     L0036
-	beq     L0036
+	bcc     L0034
+	beq     L0034
 	lda     #$10
-	bra     L0031
-L0036:	lda     M0003
-	cmp     M0005
-	bcc     L0037
-	beq     L0037
-	lda     #$01
-	bra     L0031
-L0037:	lda     M0004
-	cmp     M0006
-	bcs     L0038
-	lda     #$F0
-	bra     L0031
-L0038:	lda     M0003
-	cmp     M0005
-	bcs     L0039
-	lda     #$FF
-L0031:	sta     M0001
-L0039:	lda     M0001
 	clc
 	adc     M0002
 	sta     M0002
+	bra     L001B
+L0034:	lda     M0003
+	cmp     M0005
+	bcc     L0035
+	bne     L003A
+L0035:	lda     M0004
+	cmp     M0006
+	bcs     L0036
+	lda     M0002
+	sec
+	sbc     #$10
+	sta     M0002
+	bra     L001B
+L0036:	lda     M0003
+	cmp     M0005
+	bcs     L001B
+	dec     M0002
 	bra     L001B
 L000B:	jsr     _rand
 	and     #$03
@@ -305,50 +307,50 @@ L000B:	jsr     _rand
 	lda     _mons_xy,y
 	sta     M0002
 	lda     M0001
-	beq     L003A
+	beq     L0037
 	cmp     #$01
-	beq     L003B
+	beq     L0038
 	cmp     #$02
-	beq     L003C
+	beq     L0039
 	cmp     #$03
-	beq     L003D
+	beq     L003A
 	bra     L001B
-L003A:	lda     M0002
+L0037:	lda     M0002
 	sec
 	sbc     #$10
 	sta     M0002
 	bra     L001B
-L003B:	dec     M0002
+L0038:	dec     M0002
 	bra     L001B
-L003C:	lda     #$10
+L0039:	lda     #$10
 	clc
 	adc     M0002
 	sta     M0002
 	bra     L001B
-L003D:	inc     M0002
+L003A:	inc     M0002
 L001B:	ldy     M0002
 	lda     _map,y
 	cmp     #$23
-	bne     L0025
+	bne     L0024
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L0025:	ldy     M0002
+L0024:	ldy     M0002
 	ldx     #$00
 	lda     _map,y
 	cmp     #$4D
-	bne     L003E
+	bne     L003B
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L003E:	lda     M0002
+L003B:	lda     M0002
 	cmp     _plyr_pos
-	bne     L002B
+	bne     L002A
 	jsr     _mtpCmbt
 	ldy     _g_i
 	lda     _mons_xy,y
 	sta     M0002
-L002B:	ldy     _g_i
+L002A:	ldy     _g_i
 	lda     _mons_xy,y
 	clc
 	adc     #<(_map)
@@ -373,13 +375,11 @@ L000A:	ldy     _g_i
 	lda     _mons_ch,y
 	sta     (ptr1)
 	inc     _g_i
-	jmp     L0032
+	jmp     L0030
 
 .segment	"RODATA"
 
 M0008:
-	.word	$0000
-M0009:
 	.word	$0000
 M0007:
 	.word	$0000
@@ -541,7 +541,7 @@ L0002:	sta     _map,y
 	cpy     #$A0
 	bne     L0002
 	lda     #$11
-L001A:	sta     _g_i
+L0019:	sta     _g_i
 	cmp     #$90
 	bcs     L0004
 	lda     #<(_map)
@@ -560,7 +560,7 @@ L0008:	sta     (ptr1),y
 	lda     #$10
 	clc
 	adc     _g_i
-	bra     L001A
+	bra     L0019
 L0004:	lda     #<(S0003)
 	ldx     #>(S0003)
 	jsr     __puts
@@ -570,7 +570,7 @@ L0004:	lda     #<(S0003)
 	sta     _plyr_hp
 	stz     _g_i
 	ldx     #$00
-L001B:	lda     _g_i
+L001A:	lda     _g_i
 	cmp     #$03
 	bcs     L000A
 L000D:	lda     #<(_mons_xy)
@@ -617,13 +617,10 @@ L0010:	jsr     pushax
 	sta     _mons_hp,y
 	ldx     #$00
 	inc     _g_i
-	bra     L001B
+	bra     L001A
 L000A:	jsr     _parsInpt
 	jsr     _updtPlyr
 	jsr     _updtMons
-	ldy     _plyr_pos
-	lda     #$40
-	sta     _map,y
 	lda     #<(S0004)
 	ldx     #>(S0004)
 	jsr     __puts

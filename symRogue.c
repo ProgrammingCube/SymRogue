@@ -181,14 +181,13 @@ void updtMons()
 				goto m_randMv;
 			mtmp_pos = mons_xy[ g_i ];
 			if ( py > my )
-				dir = ROW_LEN;
+				mtmp_pos += ROW_LEN;
 			else if ( px > mx )
-				dir = 1;
+				mtmp_pos++;
 			else if ( py < my )
-				dir = -ROW_LEN;
+				mtmp_pos -= ROW_LEN;
 			else if ( px < mx )
-				dir = -1;
-			mtmp_pos += dir;
+				mtmp_pos--;
 		}
 		else
 		{
