@@ -5,7 +5,7 @@
 #define	COL_HEIGHT	10
 #define	MAP_SIZE	ROW_LEN * COL_HEIGHT
 #define	ROW_MASK	( ROW_LEN - 1 )
-#define	MONS_NUM	3
+#define	MONS_NUM	6
 #define	MONS_XP		10
 #define	MONS_ATK	5
 #define	PLYR_ATK	10
@@ -20,6 +20,7 @@ unsigned char map[ MAP_SIZE ];
 unsigned char k_input = 0x00;
 unsigned char plyr_pos,
 	      temp_pos,
+	      mtmp_pos,
 	      plyr_hp,
 	      g_i;
 #pragma bss-name (pop)
@@ -27,6 +28,7 @@ unsigned char plyr_pos,
 unsigned char k_input = 0x00;
 unsigned char plyr_pos,
 	      temp_pos,
+	      mtmp_pos,
 	      plyr_hp,
 	      g_i;
 #endif
@@ -39,6 +41,7 @@ unsigned char mons_xy[ MONS_NUM ],
 void parsInpt();
 void updtPlyr();
 void updtMons();
+void drawMons();
 void mtpCmbt();
 void ptmCmbt();
 void printMap();
@@ -83,7 +86,8 @@ void main()
 
 		/* monster routines */
 		updtMons();
-
+		
+		drawMons();
 		/* update player position AFTER all updates */
 		map[ plyr_pos ] = '@';
 
@@ -164,22 +168,20 @@ void updtMons()
 	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
 	{
 		char dir;
-		unsigned char mtmp_pos;
-
 		unsigned char px = plyr_pos % ROW_LEN;  // Player X position
 		unsigned char py = plyr_pos / ROW_LEN;  // Player Y position
 		unsigned char mx = mons_xy[g_i] % ROW_LEN;  // Monster X position
 		unsigned char my = mons_xy[g_i] / ROW_LEN;  // Monster Y position
-
+		mtmp_pos = mons_xy[ g_i ];
+		
 		/* check to see if monster is alive even */
 		if ( mons_ch[ g_i ] == '%' )
-			goto endDMons;
+			continue;
 		/* 50% chance of moving toward you if < 5 in square */
-		if ( ( abs( mx - px ) < 5 ) && ( abs( my - py ) < 5 ) )
+		if ( ( abs( mx - px ) < 2 ) && ( abs( my - py ) < 2 ) )
 		{
 			if ( ( rand() & 1 ) )
 				goto m_randMv;
-			mtmp_pos = mons_xy[ g_i ];
 			if ( py > my )
 				mtmp_pos += ROW_LEN;
 			else if ( px > mx )
@@ -194,7 +196,6 @@ void updtMons()
 m_randMv:
 			/* generate random position */
 			dir = rand() & 3;
-			mtmp_pos = mons_xy[ g_i ];
 			switch ( dir )
 			{
 				case 0:
@@ -229,8 +230,27 @@ m_randMv:
 		}
 		map[ mons_xy [ g_i ] ] = '.';
 		mons_xy[ g_i ] = mtmp_pos;
-endDMons:
-		map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
+	}
+}
+
+/* void drawMons()
+ *
+ * draw monsters corpse-first
+ */
+void drawMons()
+{
+	/* draw corpses */
+	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
+	{
+		if ( mons_ch[ g_i ] == '%' )
+			map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
+	}
+	
+	/* draw living monsters */
+	for ( g_i = 0; g_i < MONS_NUM; ++g_i )
+	{
+		if ( mons_ch[ g_i ] == 'M' )
+			map[ mons_xy[ g_i ] ] = mons_ch[ g_i ];
 	}
 }
 
