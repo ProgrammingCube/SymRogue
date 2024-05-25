@@ -281,10 +281,10 @@ void mtpCmbt()
  */
 void printMap()
 {
-	for ( g_i = 0; g_i < MAP_SIZE; ++g_i )
+	for ( g_i = 0; g_i < MAP_SIZE; )
 	{
 		putchar( map[ g_i ] );
-		if ( ! ( ( g_i + 1 ) & ( ROW_MASK ) ) )
+		if ( ! ( ( ++g_i ) & ( ROW_MASK ) ) )
 		{
 			newline();
 		}
